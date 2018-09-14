@@ -1,75 +1,123 @@
 import numpy as np
-
-def standard_confusion_matrix(y_true,y_predict):
-    tp = np.sum((y_predict == 1) & (y_predict == y_true))
-    fp = np.sum((y_predict == 1) & (y_true == 0))
-    fn = np.sum((y_predict == 0) & (y_true == 1))
-    tn = np.sum((y_predict == 0) & (y_true == y_predict))
-    confusion_matrix = np.array([[tp,fn],[fp,tn]])
-    return confusion_matrix,fp,tp
-    # """Make confusion matrix with format:
-    #               -----------
-    #               | TP | FP |
-    #               -----------
-    #               | FN | TN |
-    #               -----------
-    # Parameters
-    # ----------
-    # y_true : ndarray - 1D
-    # y_pred : ndarray - 1D
-    # Returns
-    # -------
-    # ndarray - 2D
-    # """
-    # [[tn, fp], [fn, tp]] = confusion_matrix(y_true, y_pred)
-    # return np.array([[tp, fp], [fn, tn]])
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.metrics import roc_auc_score, roc_curve, confusion_matrix
+plt.style.use('ggplot')
 
 def profit_curve(cost_benefit, predicted_probs, labels):
-    '''
-    INPUTS:
-    cost_benefit: your cost-benefit matrix
-    predicted_probs: predicted probability for each datapoint (between 0 and 1)
-    labels: true labels for each data point (either 0 or 1)
+    """Function to calculate list of profits based on supplied cost-benefit
+    matrix and prediced probabilities of data points and thier true labels.
+    Parameters
+    ----------
+    cost_benefit    : ndarray - 2D, with profit values corresponding to:
+                                          -----------
+                                          | TP | FP |
+                                          -----------
+                                          | FN | TN |
+                                          -----------
+    predicted_probs : ndarray - 1D, predicted probability for each datapoint
+                                    in labels, in range [0, 1]
+    labels          : ndarray - 1D, true label of datapoints, 0 or 1
+    Returns
+    -------
+    profits    : ndarray - 1D
+    thresholds : ndarray - 1D
+    """
+    n_obs = float(len(labels))
+    # Make sure that 1 is going to be one of our thresholds
+    maybe_one = [] if 1 in predicted_probs else [1] 
+    thresholds = maybe_one + sorted(predicted_probs, reverse=True)
+    profits = []
+    for threshold in thresholds:
+        y_predict = predicted_probs >= threshold
+        confusion_matrix = standard_confusion_matrix(labels, y_predict)
+        threshold_profit = np.sum(confusion_matrix * cost_benefit)# / n_obs
+        profits.append(threshold_profit)
+    return np.array(profits), np.array(thresholds)
 
-    OUTPUTS:
-    array of profits and their associated thresholds
-    '''
-    idx = np.argsort(predicted_probs)
-    predicted_probs= predicted_probs[idx]
-    #predicted_probs = np.insert(predicted_probs,-1,1)
+def standard_confusion_matrix(y_true, y_pred):
+    """Make confusion matrix with format:
+                  -----------
+                  | TP | FP |
+                  -----------
+                  | FN | TN |
+                  -----------
+    Parameters
+    ----------
+    y_true : ndarray - 1D
+    y_pred : ndarray - 1D
+    Returns
+    -------
+    ndarray - 2D
+    """
+    [[tn, fp], [fn, tp]] = confusion_matrix(y_true, y_pred)
+    return np.array([[tp, fp], [fn, tn]])
 
-    labels = labels[idx]
-    pred_temp = np.zeros(len(labels))
-    thresholds = predicted_probs
-    thresholds = np.insert(predicted_probs,0,0)
+def get_model_profits(model, cost_benefit, X_test, y_test):
+    """Predicts passed model on testing data and calculates profit from cost-benefit
+    matrix at each probability threshold.
+    Parameters
+    ----------
+    model           : sklearn model - need to implement predict
+    cost_benefit    : ndarray - 2D, with profit values corresponding to:
+                                          -----------
+                                          | TP | FP |
+                                          -----------
+                                          | FN | TN |
+                                          -----------
+    X_test          : ndarray - 2D
+    y_test          : ndarray - 1D
+    Returns
+    -------
+    model_profits : model, profits, thresholds
+    """
+    predicted_probs = model.predict_proba(X_test)[:, 1]
+    profits, thresholds = profit_curve(cost_benefit, predicted_probs, y_test)
 
-    cost = []
-    for thresh in thresholds:
+    return profits, thresholds
 
-        pred_temp = np.zeros(len(labels))
-        pred_temp[predicted_probs > thresh] = 1
-        pred_temp[predicted_probs <= thresh] = 0
-        conf, fpr,tpr,= standard_confusion_matrix(np.array(labels),np.array(pred_temp))
+def plot_model_profits(model_profits, save_path=None):
+    """Plotting function to compare profit curves of different models.
+    Parameters
+    ----------
+    model_profits : list((model, profits, thresholds))
+    save_path     : str, file path to save the plot to. If provided plot will be
+                         saved and not shown.
+    """
+    for model, profits, threshold in model_profits:
+        # percentages = np.linspace(0, 100, profits.shape[0])
+        plt.plot(threshold, profits, label=model.__class__.__name__)
 
-        cost.append(np.sum((conf*cost_benefit))/len(labels))
+    plt.title("Profit Curves")
+    plt.xlabel("Threshold used to classifier churn")
+    plt.ylabel("Profit")
+    plt.legend(loc='best')
+    if save_path:
+        plt.savefig(save_path)
+    else:
+        plt.show()
 
-
-    return (np.array([cost,thresholds]))
-
-def plot_profit_curve(model, cost_benefit, X_train, X_test, y_train, y_test,ax):
-    model = model
-    model.fit(X_train,y_train)
-    test_probs = model.predict_proba(X_test)
-    profits = profit_curve(cost_benefit, test_probs[:,1], y_test.values)
-    profits = list(reversed(profits[0,:]))
-    p = np.linspace(0,len(profits)/8,len(profits))
-
-    ax.plot(p,profits,label=model.__class__.__name__)
-    ax.grid(alpha = .4,color = 'r',linestyle = ':')
-    ax.set_xlabel('Percentage of Test instances (decreasing by score)')
-    ax.set_ylabel('Profit')
-    ax.set_title('Profit Curves')
-    return model.predict(X_test),profits,p
+def find_best_threshold(model_profits):
+    """Find model-threshold combo that yields highest profit.
+    Parameters
+    ----------
+    model_profits : list((model, profits, thresholds))
+    Returns
+    -------
+    max_model     : str
+    max_threshold : float
+    max_profit    : float
+    """
+    max_model = None
+    max_threshold = None
+    max_profit = None
+    for model, profits, thresholds in model_profits:
+        max_index = np.argmax(profits)
+        if not max_model or profits[max_index] > max_profit:
+            max_model = model
+            max_threshold = thresholds[max_index]
+            max_profit = profits[max_index]
+    return max_model, max_threshold, max_profit
 
 def plot_(df,target,ax):
     ax[0].hist(df.trips_in_first_30_days[target == 0],bins = list(np.linspace(0,20,50)),alpha = .6,label = 'no churn',normed = 1);
