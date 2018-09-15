@@ -1,6 +1,8 @@
 #  Rideshare App Churn Prediction 
 
-This casestudy is focused on rider last 30 days retention for a ride-sharing company X. The purpose of this notebook is to help understand what factors are the best predictors for retention, and offer suggestions to help Company X. [link to the notebook](http://nbviewer.jupyter.org/github/gukun770/churn/blob/master/Rideshare_App_Churn_Prediction.ipynb)
+This casestudy is focused on rider last 30 days retention for a ride-sharing company X. The purpose of this notebook is to help understand what factors are the best predictors for retention, and offer suggestions to help Company X. 
+
+[link to the notebook](http://nbviewer.jupyter.org/github/gukun770/churn/blob/master/Rideshare_App_Churn_Prediction.ipynb)
 
 ### Content
 * [1. Data Description and EDA](#$$1.\-Data\-Description\-and\-EDA$$)
