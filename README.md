@@ -5,16 +5,16 @@ This casestudy is focused on rider last 30 days retention for a ride-sharing com
 [link to the notebook](http://nbviewer.jupyter.org/github/gukun770/churn/blob/master/Rideshare_App_Churn_Prediction.ipynb)
 
 ### Content
-* [1. Data Description and EDA](#$$1.\-Data\-Description\-and\-EDA$$)
-    * [1.1 Data Description](#1.1-Data-Description)
-    * [1.2 EDA](#1.2-EDA)
-* [2. Modeling](#$$2.\-Modeling$$)
-    * [2.1 Model Training](#2.1-Model-Training)
-    * [2.2 Feature Importance](#2.2-Feature-Importance)
-    * [2.3 Feature Impact](#2.3-Feature-Impact)
-* [3. User Resurrection](#$$3.\-User\-Resurrection$$)
-    * [3.1 Cost Benefit Matrix](#3.1-Cost-Benefit-Matrix)
-    * [3.2 Profit Curve](#3.2-Profit-Curve)
+* 1. Data Description and EDA
+    * 1.1 Data Description
+    * 1.2 EDA
+* 2. Modeling
+    * 2.1 Model Training
+    * 2.2 Feature Importance
+    * 2.3 Feature Impact
+* 3. User Resurrection
+    * 3.1 Cost Benefit Matrix)
+    * 3.2 Profit Curve
 
 
 ### Label: did a user churn? 
