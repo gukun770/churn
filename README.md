@@ -13,7 +13,7 @@ This casestudy is focused on rider last 30 days retention for a ride-sharing com
     * 2.2 Feature Importance
     * 2.3 Feature Impact
 * 3. User Resurrection
-    * 3.1 Cost Benefit Matrix)
+    * 3.1 Cost Benefit Matrix
     * 3.2 Profit Curve
 
 
