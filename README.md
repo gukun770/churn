@@ -1,11 +1,23 @@
-#  Rideshare App Churn Prediction
+#  Rideshare App Churn Prediction 
+
+This casestudy is focused on rider last 30 days retention for a ride-sharing company X. The purpose of this notebook is to help understand what factors are the best predictors for retention, and offer suggestions to help Company X. [link to the notebook](http://nbviewer.jupyter.org/github/gukun770/churn/blob/master/Rideshare_App_Churn_Prediction.ipynb)
+
+### Content
+* [1. Data Description and EDA](#$$1.\-Data\-Description\-and\-EDA$$)
+    * [1.1 Data Description](#1.1-Data-Description)
+    * [1.2 EDA](#1.2-EDA)
+* [2. Modeling](#$$2.\-Modeling$$)
+    * [2.1 Model Training](#2.1-Model-Training)
+    * [2.2 Feature Importance](#2.2-Feature-Importance)
+    * [2.3 Feature Impact](#2.3-Feature-Impact)
+* [3. User Resurrection](#$$3.\-User\-Resurrection$$)
+    * [3.1 Cost Benefit Matrix](#3.1-Cost-Benefit-Matrix)
+    * [3.2 Profit Curve](#3.2-Profit-Curve)
 
 
-This casestudy is focused on rider last30 retention for a ride-sharing company.
 ### Label: did a user churn? 
 #### Definitions:
 
-A ride-sharing company (Company X) is interested in predicting rider retention.
 To help explore this question, a sample dataset of a cohort of users who signed up for an account in January 2014. **The data was pulled on July1, 2014**; A user is considered retained if they were “active” (i.e. took a trip)
 in the preceding 30 days (from the day the data was pulled). In other words, a user is "active" if they have taken a trip since June 1, 2014. 
 
