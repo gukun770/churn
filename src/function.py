@@ -31,7 +31,7 @@ def profit_curve(cost_benefit, predicted_probs, labels):
     for threshold in thresholds:
         y_predict = predicted_probs >= threshold
         confusion_matrix = standard_confusion_matrix(labels, y_predict)
-        threshold_profit = np.sum(confusion_matrix * cost_benefit)# / n_obs
+        threshold_profit = np.sum(confusion_matrix * cost_benefit) / n_obs
         profits.append(threshold_profit)
     return np.array(profits), np.array(thresholds)
 
